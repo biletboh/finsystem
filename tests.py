@@ -21,13 +21,17 @@ class RolesModelTestCase(unittest.TestCase):
                             last_name='Doe', email='johndoe@mail.com',
                             balance=0)
         self.session.add(client1)
-        self.session.commit()
         manager1 = models.Manager(
                                 id=1, username='Helper')
+        self.session.add(manager1)
+        self.session.commit()
+
         
     def test_clients_model(self):
         clients = self.session.query(models.Client).all()
+        managers = self.session.query(models.Manager).all()
         assert len(clients) == 1
+        assert len(managers) == 1
 
     def tearDown(self):
         self.session.remove()
