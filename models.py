@@ -14,6 +14,7 @@ class Client(Base):
     last_name = Column(String)
     email = Column(String, unique=True)
     passport_number = Column(String, unique=True)
+    balance = Column(Integer)
   
     #Add a property decorator to serialize information from Client model 
     @property

@@ -18,7 +18,8 @@ class RolesModelTestCase(unittest.TestCase):
         Base.metadata.create_all(bind=self.engine)
         client1 = models.Client(
                             id=1, first_name='John',
-                            last_name='Doe', email='johndoe@mail.com')
+                            last_name='Doe', email='johndoe@mail.com',
+                            balance=0)
         self.session.add(client1)
         self.session.commit()
         manager1 = models.Manager(
