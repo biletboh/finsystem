@@ -18,14 +18,24 @@ class RolesModelTestCase(unittest.TestCase):
                                                 bind=self.engine))
         Base.query = self.session.query_property()
         Base.metadata.create_all(bind=self.engine)
+
         client1 = models.Client(
                             id=1, first_name='John',
                             last_name='Doe', email='johndoe@mail.com',
+                            passport_number='AB2340923', password='123asdf',
                             balance=0)
         self.session.add(client1)
+
+        to_approve1 = models.ApprovalList(
+                                id=1, first_name='John',
+                                last_name='Doe', email='johndoe@mail.com',
+                                passport_number='AB2340923')
+        self.session.add(to_approve1)
+
         manager1 = models.Manager(
-                                id=1, username='Helper')
+                                id=1, username='Helper', password='123asdf')
         self.session.add(manager1)
+
         self.session.commit()
 
         
@@ -56,19 +66,16 @@ class RegisterEndpointTestCase(unittest.TestCase):
 
     def register(
                 self, first_name, last_name, email,
-                password, password2=None,):
+                passport_number):
         """Use helper function to register a user."""
         
-        if password2 is None:
-            password2 = password
         if email is None:
             email = username + '@example.com'
         return self.app.post('/register', data={
                                             'first_name': first_name,
                                             'last_name': first_name,
                                             'email': email,
-                                            'password': password,
-                                            'password2': password2,
+                                            'passport_number': passport_number,
                                             }, follow_redirects=True)
 
         
@@ -85,10 +92,11 @@ class RegisterEndpointTestCase(unittest.TestCase):
         rv = self.register('meh', 'foo', 'broken', '1234hello', '1234hello')
         assert b'You have to enter a valid email address' in rv.data
         rv = self.register('meh', 'beh', 'meh@mail.com', '')
-        assert b'You have to enter a password' in rv.data
-        rv = self.register('meh', 'beh', 'meh@mail', '1234hello', '1234hey')
-        assert b'The two passwords do not match' in rv.data
-        
+        assert b'You have to enter a passport_number' in rv.data
+        rv = self.register('user1', 'default', 'meh@mail.com', 'AA000000')
+        assert b'The passport number is already taken.' in rv.data
+
+ 
     def tearDown(self):
         self.session.remove()
 
