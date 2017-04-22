@@ -8,12 +8,13 @@ Base = declarative_base()
 
 
 class BaseClient(Base):
+    __abstract__ = True
+
     id = Column(Integer, primary_key=True)
     first_name = Column(String(255))
     last_name = Column(String(255))
     email = Column(String, unique=True)
     passport_number = Column(String(255), unique=True)
-    balance = Column(Integer)
   
     #Add a property decorator to serialize information from Client model 
     @property
@@ -30,18 +31,37 @@ class BaseClient(Base):
 
 class Client(BaseClient):
     __tablename__ = 'Clients'
+
     password = Column(String(255))
+    balance = Column(Integer)
+    
+    #Add a property decorator to serialize information from Client model 
+    @property
+    def serialize(self):
+        return {
+                'balance' : self.balance,
+                }
 
 
-class ApprovalList(Base):
+class ApprovalList(BaseClient):
     __tablename__ = 'Approval'
-    approved = Column(Boolean) 
+
+    approved = Column(Boolean, default=False) 
+
+    #Add a property decorator to serialize information from Client model 
+    @property
+    def serialize(self):
+        return {
+                'approved' : self.approved,
+                }
 
 
 class Manager(Base):
     __tablename__ = 'Managers'
+
     id = Column(Integer, primary_key=True)
     username = Column(String(255), unique=True)
+    password = Column(String(255))
   
     #Add a property decorator to serialize information from Manager model 
     @property
