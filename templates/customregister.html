@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>Login Page</title>
+</head>
+<body>
+<form method="POST" action="/">
+  {{ form.hidden_tag() }}
+  {% for f in form %}
+  {{ f.label }} {{ f }}
+  {% for error in f.errors %}
+  <span style="color: red;">[{{ error }}]</span>
+  {% endfor %}<br>
+  {% endfor %}
+  <input type="submit" value="Go">
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <ul>
+    {% for message in messages %}
+    <li>{{ message }} </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</form>
+</body>
+</html>
