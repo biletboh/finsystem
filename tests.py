@@ -64,6 +64,18 @@ class RegisterEndpointTestCase(unittest.TestCase):
         Base.metadata.create_all(bind=self.engine)
         self.app = app.test_client()
 
+        app.config['TESTING'] = True
+        app.config['WTF_CSRF_ENABLED'] = False
+
+        client1 = models.Client(
+                            id=1, first_name='John',
+                            last_name='Doe', email='johndoe@mail.com',
+                            passport_number='AA000000', password='123asdf',
+                            balance=0)
+        self.session.add(client1)
+        self.session.commit()
+
+
     def register(
                 self, first_name, last_name, email,
                 passport_number):
@@ -73,7 +85,7 @@ class RegisterEndpointTestCase(unittest.TestCase):
             email = username + '@example.com'
         return self.app.post('/register', data={
                                             'first_name': first_name,
-                                            'last_name': first_name,
+                                            'last_name': last_name,
                                             'email': email,
                                             'passport_number': passport_number,
                                             }, follow_redirects=True)
@@ -81,16 +93,18 @@ class RegisterEndpointTestCase(unittest.TestCase):
         
     def test_register_endpoint(self):
         """Make sure registering works."""
-        rv = self.register('user1', 'default', 'meh@mail', '1234hello')
-        assert b'Your account waits for approval.' in rv.data
+#        rv = self.register('user1', 'default', 'meh@mail', '1234hello')
+#        assert b'Your account waits for approval.' in rv.data
         rv = self.register('', 'default', 'meh@mail', '1234hello')
-        assert b'You have to enter a first_name' in rv.data
-        rv = self.register('meh', '', 'meh@mail', '1234hello')
-        assert b'You have to enter a last_name' in rv.data
-        rv = self.register('user1', 'default', 'admin@mail.com', '1234hello')
-        assert b'The email is already taken.' in rv.data
-        rv = self.register('meh', 'foo', 'broken', '1234hello', '1234hello')
+        assert b'You have to enter a first_name.' in rv.data
+        rv = self.register('meho', '', 'meh@mail', '1234hello')
+        assert b'You have to enter a last_name.' in rv.data
+        rv = self.register('ola', 'default', '', '1234hello')
+        assert b'You have to enter an email.' in rv.data
+        rv = self.register('meh', 'foo', 'broken', '1234hello')
         assert b'You have to enter a valid email address' in rv.data
+        rv = self.register('user1', 'default', 'johndoe@mail.com', 'AA000000')
+        assert b'The email is already taken.' in rv.data
         rv = self.register('meh', 'beh', 'meh@mail.com', '')
         assert b'You have to enter a passport_number' in rv.data
         rv = self.register('user1', 'default', 'meh@mail.com', 'AA000000')
