@@ -3,8 +3,18 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 
+from flask_security import Security, SQLAlchemyUserDatastore, \
+    UserMixin, RoleMixin, login_required
+
 
 Base = declarative_base()
+
+class Role(Base, RoleMixin):
+    __tablename__ = 'Roles'
+
+    id = Column(Integer(), primary_key=True)
+    name = Column(String(80), unique=True)
+    description = Column(String(255))
 
 
 class BaseClient(Base):
