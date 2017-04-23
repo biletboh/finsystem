@@ -4,7 +4,6 @@ from flask import request, redirect, render_template, flash, \
 from flask_restful import Resource
 from flask_restful import reqparse
 from models import Client, ApprovalList, Role
-from forms import RegisterForm
 from finapp import app, db, api
 
 
