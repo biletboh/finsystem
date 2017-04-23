@@ -1,22 +1,25 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import config
+
+
+#  Add dababase
+db = SQLAlchemy()
+
+
+#  Application Factory
+def create_app(configuration):
+    app = Flask(__name__)
+    app.config.from_object(configuration)
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+
+    return app
 
 
 #  Create application
-app = Flask(__name__)
-
-
-#  Configuration of application
-app.config.update(dict(
-                    DEBUG=True,
-                    SECRET_KEY='development key',
-                    WTF_CSRF_SECRET_KEY='secret csrf key',
-                    SQLALCHEMY_DATABASE_URI='sqlite:///roles.db',
-                    SQLALCHEMY_TRACK_MODIFICATIONS=False
-                    ))
-
-#  Add dababase
-db = SQLAlchemy(app)
+app = create_app(config)
 
 
 import views, models
