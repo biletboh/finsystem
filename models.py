@@ -1,31 +1,23 @@
-from sqlalchemy import Column, ForeignKey, Integer, Boolean, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy import create_engine
-
 from flask_security import Security, SQLAlchemyUserDatastore, \
     UserMixin, RoleMixin, login_required
+from finapp import db
 
-
-Base = declarative_base()
-
-
-class Role(Base, RoleMixin):
+class Role(db.Model, RoleMixin):
     __tablename__ = 'Roles'
 
-    id = Column(Integer(), primary_key=True)
-    name = Column(String(80), unique=True)
-    description = Column(String(255))
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
 
 
-class BaseClient(Base):
+class BaseClient(db.Model):
     __abstract__ = True
 
-    id = Column(Integer, primary_key=True)
-    first_name = Column(String(255))
-    last_name = Column(String(255))
-    email = Column(String, unique=True)
-    passport_number = Column(String(255), unique=True)
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(255))
+    last_name = db.Column(db.String(255))
+    email = db.Column(db.String, unique=True)
+    passport_number = db.Column(db.String(255), unique=True)
   
     #Add a property decorator to serialize information from Client model 
     @property
@@ -43,8 +35,8 @@ class BaseClient(Base):
 class Client(BaseClient):
     __tablename__ = 'Clients'
 
-    password = Column(String(255))
-    balance = Column(Integer)
+    password = db.Column(db.String(255))
+    balance = db.Column(db.Integer)
     
     #Add a property decorator to serialize information from Client model 
     @property
@@ -57,7 +49,7 @@ class Client(BaseClient):
 class ApprovalList(BaseClient):
     __tablename__ = 'Approval'
 
-    approved = Column(Boolean, default=False) 
+    approved = db.Column(db.Boolean, default=False) 
 
     #Add a property decorator to serialize information from Client model 
     @property
@@ -71,12 +63,12 @@ class ApprovalList(BaseClient):
                 }
 
 
-class Manager(Base):
+class Manager(db.Model):
     __tablename__ = 'Managers'
 
-    id = Column(Integer, primary_key=True)
-    username = Column(String(255), unique=True)
-    password = Column(String(255))
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255))
   
     #Add a property decorator to serialize information from Manager model 
     @property
@@ -85,10 +77,4 @@ class Manager(Base):
                 'id' : self.id,
                 'username': self.username,
                 }
-
-
-engine = create_engine('sqlite:///roles.db')
- 
-
-Base.metadata.create_all(engine)
 
