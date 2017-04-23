@@ -2,7 +2,7 @@ from flask import request, redirect, render_template, flash, \
     jsonify
 from models import Client, ApprovalList, Role
 from forms import RegisterForm
-from finapp import app
+from finapp import app, db
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -21,8 +21,8 @@ def RegisterClient():
                                 email=email,
                                 passport_number=passport_number)
 
-        session.add(to_approve)
-        session.commit()
+        db.session.add(to_approve)
+        db.session.commit()
 
         return jsonify(ApprovalList=to_approve.serialize)
 
