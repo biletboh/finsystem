@@ -9,6 +9,7 @@ from flask_security import Security, SQLAlchemyUserDatastore, \
 
 Base = declarative_base()
 
+
 class Role(Base, RoleMixin):
     __tablename__ = 'Roles'
 
@@ -62,6 +63,10 @@ class ApprovalList(BaseClient):
     @property
     def serialize(self):
         return {
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'email' : self.email,
+                'passport_number' : self.passport_number,
                 'approved' : self.approved,
                 }
 
