@@ -8,12 +8,7 @@
       <h1>Manage Clients</h1>
       <p class="lead">Authentication</p>
       {% if not current_user.is_authenticated %}
-      <p>You can log in as a manager with the following credentials:
-      <ul>
-        <li>email: <b>admin</b></li>
-        <li>password: <b>admin</b></li>
-      </ul>
-      <p>
+      <p>You have to be manager or superadmin to login to admin page.<p>
       <a class="btn btn-primary" href="{{ url_for('security.login') }}">login</a> 
       </p>
       {% endif %}

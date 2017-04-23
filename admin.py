@@ -5,7 +5,7 @@ from flask_admin import Admin
 from flask_admin import helpers as admin_helpers
 from finapp import app, db
 from security import security
-from models import Manager, ApprovalList, Role
+from models import Manager, ApprovalList, Role, Client
 
 
 #  Add Admin 
@@ -39,14 +39,15 @@ class MyModelView(ModelView):
 admin.add_view(MyModelView(Role, db.session))
 admin.add_view(MyModelView(Manager, db.session))
 admin.add_view(MyModelView(ApprovalList, db.session))
+admin.add_view(MyModelView(Client, db.session))
 
 
 @security.context_processor
 def security_context_processor():
     return dict(
-        admin_base_template=admin.base_template,
-        admin_view=admin.index_view,
-        h=admin_helpers,
-        get_url=url_for
-    )
+            admin_base_template=admin.base_template,
+            admin_view=admin.index_view,
+            h=admin_helpers,
+            get_url=url_for
+            )
 
