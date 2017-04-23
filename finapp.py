@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful import Api
 import config
 
 
@@ -21,6 +22,8 @@ def create_app(configuration):
 #  Create application
 app = create_app(config)
 
+#  Create Restful instance
+api = Api(app)
 
 import views, models
 
