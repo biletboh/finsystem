@@ -1,4 +1,5 @@
-from flask import Flask, request, redirect, render_template, flash
+from flask import Flask, request, redirect, render_template, flash, \
+    jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask_security import Security, SQLAlchemyUserDatastore, \
@@ -19,6 +20,8 @@ app.config.update(dict(
 
 engine = create_engine('sqlite:///roles.db')
 Base.metadata.bind = engine
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(Base, Client, Role)
@@ -40,9 +43,14 @@ def RegisterClient():
                                 last_name=last_name, 
                                 email=email,
                                 passport_number=passport_number)
-        flash('Your account waits for approval.')
-        return "validation works" 
 
+        session.add(to_approve)
+        session.commit()
+
+        return jsonify(ApprovalList=to_approve.serialize)
+
+    print(dir(Client))    
+    # Add basic template with form context to make tests work
     return render_template('customregister.html', form=form)
 
 

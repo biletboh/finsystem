@@ -5,6 +5,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 import models
 from finsystem import app
+from forms import RegisterForm 
 
 
 class RolesModelTestCase(unittest.TestCase):
@@ -55,13 +56,13 @@ class RegisterEndpointTestCase(unittest.TestCase):
     """Test register endpoint."""
 
     def setUp(self):
-        self.engine = create_engine('sqlite:///:memory:')
+        self.engine = create_engine('sqlite:///test.db')
         self.session = scoped_session(sessionmaker(
                                                 autocommit=False,
                                                 autoflush=False,
                                                 bind=self.engine))
         Base.query = self.session.query_property()
-        Base.metadata.create_all(bind=self.engine)
+        Base.metadata.bind = self.engine
         self.app = app.test_client()
 
         app.config['TESTING'] = True
@@ -74,7 +75,11 @@ class RegisterEndpointTestCase(unittest.TestCase):
                             balance=0)
         self.session.add(client1)
         self.session.commit()
-
+ 
+    def tearDown(self):
+        Base.query = self.session.query_property()
+        print('metadata', Base.metadata)
+        self.session.remove()
 
     def register(
                 self, first_name, last_name, email,
@@ -93,11 +98,11 @@ class RegisterEndpointTestCase(unittest.TestCase):
         
     def test_register_endpoint(self):
         """Make sure registering works."""
-#        rv = self.register('user1', 'default', 'meh@mail', '1234hello')
+#        rv = self.register('user1', 'default', 'snewmail@mail.com', 'AA9090909')
 #        assert b'Your account waits for approval.' in rv.data
-        rv = self.register('', 'default', 'meh@mail', '1234hello')
+        rv = self.register('', 'default', 'meh@mail.com', '1234hello')
         assert b'You have to enter a first_name.' in rv.data
-        rv = self.register('meho', '', 'meh@mail', '1234hello')
+        rv = self.register('meho', '', 'meh@mail.com', '1234hello')
         assert b'You have to enter a last_name.' in rv.data
         rv = self.register('ola', 'default', '', '1234hello')
         assert b'You have to enter an email.' in rv.data
@@ -109,10 +114,6 @@ class RegisterEndpointTestCase(unittest.TestCase):
         assert b'You have to enter a passport_number' in rv.data
         rv = self.register('user1', 'default', 'meh@mail.com', 'AA000000')
         assert b'The passport number is already taken.' in rv.data
-
- 
-    def tearDown(self):
-        self.session.remove()
 
 
 if __name__ == '__main__':
