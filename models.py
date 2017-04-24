@@ -2,8 +2,16 @@ from flask_security import Security, SQLAlchemyUserDatastore, \
     UserMixin, RoleMixin, login_required
 from finapp import db
 
+
+roles_managers = db.Table(
+    'roles_managers',
+    db.Column('manager_id', db.Integer(), db.ForeignKey('manager.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
+
+
 class Role(db.Model, RoleMixin):
-    __tablename__ = 'Roles'
+    __tablename__ = 'role'
 
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
@@ -32,9 +40,10 @@ class BaseClient(db.Model):
                 }
 
 
-class Client(BaseClient):
+class Client(BaseClient, UserMixin):
     __tablename__ = 'Clients'
-
+    
+    active = db.Column(db.Boolean())
     password = db.Column(db.String(255))
     balance = db.Column(db.Integer)
     
@@ -42,7 +51,8 @@ class Client(BaseClient):
     @property
     def serialize(self):
         return {
-                'balance' : self.balance,
+                'balance': self.balance,
+                'active': self.active
                 }
 
 
@@ -63,13 +73,16 @@ class ApprovalList(BaseClient):
                 }
 
 
-class Manager(db.Model):
-    __tablename__ = 'Managers'
+class Manager(db.Model, UserMixin):
+    __tablename__ = 'manager'
 
     id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean(), default=True)
     username = db.Column(db.String(255), unique=True)
     email = db.Column(db.String, unique=True)
     password = db.Column(db.String(255))
+    roles = db.relationship('Role', secondary=roles_managers, 
+                        backref=db.backref('managers', lazy='dynamic'))
   
     #Add a property decorator to serialize information from Manager model 
     @property
@@ -80,3 +93,6 @@ class Manager(db.Model):
                 'email': self.email,
                 }
 
+
+db.create_all()
+db.session.commit()
