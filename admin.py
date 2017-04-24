@@ -12,7 +12,7 @@ from models import Manager, ApprovalList, Role, Client
 admin = Admin(app, 'Management', template_mode='bootstrap3')
 
 
-class MyModelView(ModelView):
+class SuperAdminModelView(ModelView):
 
     def is_accessible(self):
         if not current_user.is_active or not current_user.is_authenticated:
@@ -20,6 +20,9 @@ class MyModelView(ModelView):
 
         if current_user.has_role('superuser'):
             return True
+
+#        if current_user.has_role('manager'):
+#            return True
 
         return False
 
@@ -36,10 +39,19 @@ class MyModelView(ModelView):
                 return redirect(url_for('security.login', next=request.url))
 
 
-admin.add_view(MyModelView(Role, db.session))
-admin.add_view(MyModelView(Manager, db.session))
-admin.add_view(MyModelView(ApprovalList, db.session))
-admin.add_view(MyModelView(Client, db.session))
+class AdminModelView(SuperAdminModelView):
+
+    def is_accessible(self):
+
+        if current_user.has_role('manager'):
+            return True
+
+        return super(AdminModelView, self).is_accessible()
+
+
+admin.add_view(SuperAdminModelView(Manager, db.session))
+admin.add_view(AdminModelView(ApprovalList, db.session))
+admin.add_view(AdminModelView(Client, db.session))
 
 
 @security.context_processor
