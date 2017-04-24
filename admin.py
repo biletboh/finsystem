@@ -9,7 +9,9 @@ from models import Manager, ApprovalList, Role, Client
 
 
 #  Add Admin 
-admin = Admin(app, 'Management', template_mode='bootstrap3')
+admin = Admin(
+            app, 'Management', base_template='my_master.html', 
+            template_mode='bootstrap3')
 
 
 class SuperAdminModelView(ModelView):
