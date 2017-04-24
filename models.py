@@ -1,3 +1,5 @@
+from passlib.apps import custom_app_context as pwd_context
+from flask_security.utils import encrypt_password
 from flask_security import Security, SQLAlchemyUserDatastore, \
     UserMixin, RoleMixin, login_required
 from finapp import db
@@ -16,6 +18,9 @@ class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
+
+    def __str__(self):
+        return self.name
 
 
 class BaseClient(db.Model):
@@ -54,6 +59,9 @@ class Client(BaseClient, UserMixin):
                 'balance': self.balance,
                 'active': self.active
                 }
+    
+    def __str__(self):
+        return self.email
 
 
 class ApprovalList(BaseClient):
@@ -72,6 +80,9 @@ class ApprovalList(BaseClient):
                 'approved' : self.approved,
                 }
 
+    def __str__(self):
+        return self.email
+
 
 class Manager(db.Model, UserMixin):
     __tablename__ = 'manager'
@@ -83,7 +94,10 @@ class Manager(db.Model, UserMixin):
     password = db.Column(db.String(255))
     roles = db.relationship('Role', secondary=roles_managers, 
                         backref=db.backref('managers', lazy='dynamic'))
-  
+
+    def __str__(self):
+        return self.email
+
     #Add a property decorator to serialize information from Manager model 
     @property
     def serialize(self):
