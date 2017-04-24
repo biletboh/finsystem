@@ -110,3 +110,4 @@ class Manager(db.Model, UserMixin):
 
 db.create_all()
 db.session.commit()
+

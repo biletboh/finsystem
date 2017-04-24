@@ -4,18 +4,20 @@ from security import user_datastore
 from models import Role, Manager
 
 
-#  Run this script to create Superuser
+#  Run this script to create roles and Superuser
 def create_roles_and_superuser():
     with app.app_context():
-
+        
+        #  Create roles 
         sup_role = Role(
-                name='superuser', 
-                description='This user can create managers.'
-                )
+                    name='superuser', 
+                    description='This user can create managers.'
+                    )
 
         man_role = Role(
-            name='manager', 
-            description='Managers can approve client accounts')
+                    name='manager', 
+                    description='Managers can approve client accounts')
+
         db.session.add(sup_role)
         db.session.add(man_role)
         db.session.commit()
@@ -25,7 +27,6 @@ def create_roles_and_superuser():
                 username='SuperManager', email='admin@mail.com',
                 password=encrypt_password('superuserpass'),
                 roles=[sup_role])
-        #sup_role.managers.append(superuser)
 
         db.session.commit()
 
